@@ -22,6 +22,13 @@ const BookSchema = new mongoose.Schema({
         ref: "User"
     },
 
+
+    rating: {
+        type: Number,
+        default: 0
+
+    },
+
     wishlistBy: [
         {
             type: mongoose.Schema.Types.ObjectId,

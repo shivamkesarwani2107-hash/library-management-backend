@@ -347,6 +347,17 @@ app.put("/wishlist/:id", async (req, resp) => {
 
 });
 
+app.get("/book/:id", async (req, resp) => {
+
+    const book =
+        await Book.findById(
+            req.params.id
+        );
+
+    resp.send(book);
+
+});
+
 app.listen(4000, () => {
     console.log("SERVER IS RUNNING ON PORT 4000")
 })
