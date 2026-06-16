@@ -309,28 +309,28 @@ app.put("/book/:id", async (req, resp) => {
 
 app.put("/wishlist/:id", async (req, resp) => {
 
-    const authHeader =
-        req.headers.authorization;
+    const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
+    const token = authHeader.split(" ")[1];
 
-        return resp.status(401).send({
-            message: "Token Required"
+    const decoded = jwt.verify(
+        token,
+        "acessscret"
+    );
+
+    const userId = decoded.id;
+
+    const book = await Book.findById(
+        req.params.id
+    );
+
+    if (book.wishlistBy.includes(userId)) {
+
+        return resp.send({
+            message: "Already in Wishlist"
         });
 
     }
-
-    const token =
-        authHeader.split(" ")[1];
-
-    const decoded =
-        jwt.verify(
-            token,
-            "acessscret"
-        );
-
-    const userId =
-        decoded.id;
 
     await Book.findByIdAndUpdate(
         req.params.id,
