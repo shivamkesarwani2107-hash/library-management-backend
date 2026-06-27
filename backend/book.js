@@ -12,9 +12,9 @@ const BookSchema = new mongoose.Schema({
         trim: true
     },
 
-    category: {
-        type: String,
-        trim: true
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category"
     },
 
     userId: {

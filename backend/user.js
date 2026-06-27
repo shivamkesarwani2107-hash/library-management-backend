@@ -168,10 +168,27 @@ app.post("/book", async (req, resp) => {
             message: "All fields are required"
         });
     }
+
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return resp.status(401).send({
+            message: "Token Required"
+        });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(
+        token,
+        "acessscret"
+    );
+
     const book = new Book({
         title,
         author,
-        category
+        category,
+        userId: decoded.id
     });
 
     await book.save();
@@ -188,7 +205,7 @@ app.get("/book", async (req, resp) => {
         Number(req.query.page) || 1;
 
     const limit =
-        Number(req.query.limit) || 3;
+        Number(req.query.limit) || 8;
 
     const search =
         req.query.search || "";
@@ -226,6 +243,8 @@ app.get("/book", async (req, resp) => {
     resp.send(books);
 
 });
+
+
 
 
 app.get("/wishlist", async (req, resp) => {
@@ -271,32 +290,16 @@ app.delete("/book/:id", async (req, resp) => {
     });
 });
 
-app.post("/book", async (req, resp) => {
-
-    const { title, author } = req.body;
-
-    const book = new Book({
-        title,
-        author
-    });
-
-    await book.save();
-
-    resp.send({
-        message: "Book Added"
-    });
-
-});
-
 app.put("/book/:id", async (req, resp) => {
 
-    const { title, author } = req.body;
+    const { title, author , category } = req.body;
 
     await Book.findByIdAndUpdate(
         req.params.id,
         {
             title,
-            author
+            author,
+            category
         }
     );
 
@@ -352,9 +355,19 @@ app.get("/book/:id", async (req, resp) => {
     const book =
         await Book.findById(
             req.params.id
-        );
-
+        )
+            .populate("userId");
     resp.send(book);
+
+});
+
+app.get("/category/:category", async (req, resp) => {
+
+    const books = await Book.find({
+        category: req.params.category
+    });
+
+    resp.send(books);
 
 });
 
